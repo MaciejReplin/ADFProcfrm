@@ -679,7 +679,7 @@
 												"DataFactory": {
 													"type": "String",
 													"value": {
-														"value": "@item().DataFactoryName",
+														"value": "@pipeline().DataFactory",
 														"type": "Expression"
 													}
 												},
