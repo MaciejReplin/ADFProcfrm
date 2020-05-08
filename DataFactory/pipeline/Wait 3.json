@@ -14,12 +14,37 @@
 						"type": "Expression"
 					}
 				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Wait3",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "test",
+					"value": {
+						"value": "item().DataFactoryName",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
 			"WaitTime": {
 				"type": "int",
 				"defaultValue": 5
+			}
+		},
+		"variables": {
+			"test": {
+				"type": "String"
 			}
 		},
 		"folder": {
