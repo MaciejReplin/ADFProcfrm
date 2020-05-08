@@ -316,7 +316,7 @@
 										"type": "Expression"
 									},
 									"resourceGroup": {
-										"value": "\"MRPartnerResourceGroup\"\n",
+										"value": "@item().ResourceGroupName",
 										"type": "Expression"
 									},
 									"factoryName": {
