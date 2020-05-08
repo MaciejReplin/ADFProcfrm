@@ -202,7 +202,7 @@
 										"DataFactory": {
 											"type": "String",
 											"value": {
-												"value": "@item().DataFactoryName",
+												"value": "ADFprocfwkMR",
 												"type": "Expression"
 											}
 										},
