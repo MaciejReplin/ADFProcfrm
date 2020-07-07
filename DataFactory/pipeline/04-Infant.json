@@ -39,13 +39,9 @@
 								"functionName": "CheckPipelineStatus",
 								"method": "POST",
 								"body": {
-									"value": "@concat('\n{\n    \"tenantId\": \"',pipeline().parameters.TenantId,'\",\n    \"applicationId\": \"',pipeline().parameters.applicationId,'\",\n    \"authenticationKey\": \"',pipeline().parameters.authenticationKey,'\",\n    \"subscriptionId\": \"',pipeline().parameters.subscriptionId,'\",\n    \"resourceGroup\": \"MRPartnerResourceGroup\",\n    \"factoryName\": \"',pipeline().parameters.factoryName,'\",\n    \"pipelineName\": \"',pipeline().parameters.pipelineName,'\",\n    \"runId\": \"',pipeline().parameters.runId,'\"\n}')",
+									"value": "@concat('\n{\n    \"tenantId\": \"',pipeline().parameters.TenantId,'\",\n    \"applicationId\": \"',pipeline().parameters.applicationId,'\",\n    \"authenticationKey\": \"',pipeline().parameters.authenticationKey,'\",\n    \"subscriptionId\": \"',pipeline().parameters.subscriptionId,'\",\n    \"resourceGroup\": \"',pipeline().parameters.resourceGroup,'\",\n    \"factoryName\": \"',pipeline().parameters.factoryName,'\",\n    \"pipelineName\": \"',pipeline().parameters.pipelineName,'\",\n    \"runId\": \"',pipeline().parameters.runId,'\"\n}')",
 									"type": "Expression"
 								}
-							},
-							"linkedServiceName": {
-								"referenceName": "PipelineExecutor",
-								"type": "LinkedServiceReference"
 							}
 						},
 						{
@@ -84,26 +80,7 @@
 							}
 						},
 						{
-							"name": "Wait to Retry Function",
-							"type": "Wait",
-							"dependsOn": [
-								{
-									"activity": "Get Pipeline Status",
-									"dependencyConditions": [
-										"Failed"
-									]
-								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"waitTimeInSeconds": {
-									"value": "@activity('Get Wait Duration').output.firstRow.PropertyValue",
-									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "Set Last Update",
+							"name": "Set Last Check DateTime",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
@@ -151,13 +128,67 @@
 								"referenceName": "SupportDatabase",
 								"type": "LinkedServiceReference"
 							}
+						},
+						{
+							"name": "Log Activity Failure",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Get Pipeline Status",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[procfwk].[SetLogActivityFailed]",
+								"storedProcedureParameters": {
+									"CallingActivity": {
+										"value": "GetPipelineStatus",
+										"type": "String"
+									},
+									"ExecutionId": {
+										"value": {
+											"value": "@pipeline().parameters.executionId",
+											"type": "Expression"
+										},
+										"type": "Guid"
+									},
+									"PipelineId": {
+										"value": {
+											"value": "@pipeline().parameters.pipelineId",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"StageId": {
+										"value": {
+											"value": "@pipeline().parameters.stageId",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "SupportDatabase",
+								"type": "LinkedServiceReference"
+							}
 						}
 					],
 					"timeout": "7.00:00:00"
 				}
 			},
 			{
-				"name": "Pipeline Result",
+				"name": "Set Pipeline Result",
 				"description": "Receives the outcome from the function execution for a given processing pipeline and updates the current execution table with different pipelines status values depending on the result (case).",
 				"type": "Switch",
 				"dependsOn": [
@@ -270,6 +301,72 @@
 													"type": "Expression"
 												},
 												"type": "Int32"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "SupportDatabase",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "Get Error Details",
+									"description": "Get the activity error details for the run ID of the worker pipeline called. Returns an array of all errors.",
+									"type": "AzureFunctionActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"functionName": "GetActivityErrors",
+										"method": "POST",
+										"body": {
+											"value": "@concat('\n{\n    \"tenantId\": \"',pipeline().parameters.TenantId,'\",\n    \"applicationId\": \"',pipeline().parameters.applicationId,'\",\n    \"authenticationKey\": \"',pipeline().parameters.authenticationKey,'\",\n    \"subscriptionId\": \"',pipeline().parameters.subscriptionId,'\",\n    \"resourceGroup\": \"',pipeline().parameters.resourceGroup,'\",\n    \"factoryName\": \"',pipeline().parameters.factoryName,'\",\n    \"pipelineName\": \"',pipeline().parameters.pipelineName,'\",\n    \"runId\": \"',pipeline().parameters.runId,'\"\n}')",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Log Error Details",
+									"description": "Parses pipeline error details and persists them to the metadata database error log table.",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "Get Error Details",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[procfwk].[SetErrorLogDetails]",
+										"storedProcedureParameters": {
+											"JsonErrorDetails": {
+												"value": {
+													"value": "@string(activity('Get Error Details').output)",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"LocalExecutionId": {
+												"value": {
+													"value": "@pipeline().parameters.executionId",
+													"type": "Expression"
+												},
+												"type": "Guid"
 											}
 										}
 									},
