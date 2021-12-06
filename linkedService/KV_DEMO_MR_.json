@@ -1,0 +1,11 @@
+{
+	"name": "KV_DEMO_MR_",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://KV-MR-DEMO-1.vault.azure.net/"
+		}
+	}
+}

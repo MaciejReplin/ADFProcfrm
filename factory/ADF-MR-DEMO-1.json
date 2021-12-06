@@ -1,0 +1,9 @@
+{
+	"name": "ADF-MR-DEMO-1",
+	"location": "westeurope",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "93cb74fd-fef3-4d44-b5d8-ec69c44ea717",
+		"tenantId": "df7fa6cf-2f69-491d-bacd-8caa90484c7b"
+	}
+}
