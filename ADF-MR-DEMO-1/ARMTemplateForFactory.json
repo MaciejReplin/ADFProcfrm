@@ -7,9 +7,9 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "ADF-MR-DEMO-1"
 		},
-		"AzureSqlDatabase1_properties_typeProperties_connectionString_secretName": {
-			"type": "string",
-			"defaultValue": "AzureDB"
+		"AzureSqlDatabase1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'"
 		},
 		"KV_DEMO_MR__properties_typeProperties_baseUrl": {
 			"type": "string",
@@ -25,16 +25,27 @@
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"parameters": {
+					"DBName": {
+						"type": "String",
+						"defaultValue": "AzureSQLDB"
+					},
+					"dbUser": {
+						"type": "String",
+						"defaultValue": "admin"
+					}
+				},
 				"annotations": [],
 				"type": "AzureSqlDatabase",
 				"typeProperties": {
-					"connectionString": {
+					"connectionString": "[parameters('AzureSqlDatabase1_connectionString')]",
+					"password": {
 						"type": "AzureKeyVaultSecret",
 						"store": {
 							"referenceName": "KV_DEMO_MR_",
 							"type": "LinkedServiceReference"
 						},
-						"secretName": "[parameters('AzureSqlDatabase1_properties_typeProperties_connectionString_secretName')]"
+						"secretName": "AzureDB"
 					}
 				},
 				"connectVia": {

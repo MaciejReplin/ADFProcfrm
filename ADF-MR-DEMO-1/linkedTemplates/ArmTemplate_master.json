@@ -7,9 +7,9 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "ADF-MR-DEMO-1"
 		},
-		"AzureSqlDatabase1_properties_typeProperties_connectionString_secretName": {
-			"type": "string",
-			"defaultValue": "AzureDB"
+		"AzureSqlDatabase1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'"
 		},
 		"KV_DEMO_MR__properties_typeProperties_baseUrl": {
 			"type": "string",
@@ -42,11 +42,11 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"AzureSqlDatabase1_connectionString": {
+						"value": "[parameters('AzureSqlDatabase1_connectionString')]"
+					},
 					"KV_DEMO_MR__properties_typeProperties_baseUrl": {
 						"value": "[parameters('KV_DEMO_MR__properties_typeProperties_baseUrl')]"
-					},
-					"AzureSqlDatabase1_properties_typeProperties_connectionString_secretName": {
-						"value": "[parameters('AzureSqlDatabase1_properties_typeProperties_connectionString_secretName')]"
 					}
 				}
 			},

@@ -5,8 +5,8 @@
 		"factoryName": {
 			"value": "ADF-MR-DEMO-1"
 		},
-		"AzureSqlDatabase1_properties_typeProperties_connectionString_secretName": {
-			"value": "AzureDB"
+		"AzureSqlDatabase1_connectionString": {
+			"value": ""
 		},
 		"KV_DEMO_MR__properties_typeProperties_baseUrl": {
 			"value": "https://KV-MR-DEMO-1.vault.azure.net/"
