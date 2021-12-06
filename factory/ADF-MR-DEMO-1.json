@@ -1,5 +1,13 @@
 {
 	"name": "ADF-MR-DEMO-1",
+	"properties": {
+		"globalParameters": {
+			"envName": {
+				"type": "string",
+				"value": "DEV"
+			}
+		}
+	},
 	"location": "westeurope",
 	"identity": {
 		"type": "SystemAssigned",
