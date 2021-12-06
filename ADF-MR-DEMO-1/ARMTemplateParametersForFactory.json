@@ -1,0 +1,15 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "ADF-MR-DEMO-1"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_connectionString_secretName": {
+			"value": "AzureDB"
+		},
+		"KV_DEMO_MR__properties_typeProperties_baseUrl": {
+			"value": "https://KV-MR-DEMO-1.vault.azure.net/"
+		}
+	}
+}
